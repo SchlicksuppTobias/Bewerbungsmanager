@@ -3,432 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bewerbungs­tracker</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:       #f4f1ec;
-      --surface:  #fffdf9;
-      --border:   #ddd9d0;
-      --accent:   #2a4858;
-      --accent2:  #c97b3a;
-      --text:     #1c1c1c;
-      --muted:    #7a7068;
-      --success:  #2d6a4f;
-      --error:    #9b2335;
-      --radius:   8px;
-    }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      min-height: 100vh;
-      padding: 32px 16px 64px;
-      color: var(--text);
-    }
-
-    .page-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(26px, 4vw, 38px);
-      color: var(--accent);
-      text-align: center;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-    .page-subtitle {
-      text-align: center;
-      color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 36px;
-    }
-
-    .card {
-      max-width: 680px;
-      margin: 0 auto 32px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 32px 28px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
-      color: var(--accent2);
-      margin: 28px 0 14px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--border);
-    }
-    .section-label:first-child { margin-top: 0; }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      margin-bottom: 5px;
-      margin-top: 14px;
-    }
-    label:first-of-type { margin-top: 0; }
-    .req::after { content: ' *'; color: var(--accent2); }
-    .opt { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      background: var(--bg);
-      color: var(--text);
-      transition: border-color .2s, box-shadow .2s;
-      appearance: none;
-    }
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(42,72,88,.12);
-      background: #fff;
-    }
-    textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
-    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7068' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 500px) { .row { grid-template-columns: 1fr; } }
-
-    /* Collapsible contact block */
-    .collapsible-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      user-select: none;
-      padding: 10px 12px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-top: 8px;
-      transition: background .2s;
-    }
-    .collapsible-header:hover { background: #edeae3; }
-    .collapsible-header .chevron { transition: transform .25s; font-size: 10px; }
-    .collapsible-header.open .chevron { transform: rotate(180deg); }
-    .collapsible-body {
-      display: none;
-      padding: 4px 0 0;
-      animation: slideDown .2s ease;
-    }
-    .collapsible-body.open { display: block; }
-    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
-
-    /* Submit button */
-    .btn-submit {
-      margin-top: 24px;
-      width: 100%;
-      padding: 13px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.2px;
-      transition: background .2s, transform .1s;
-      position: relative;
-    }
-    .btn-submit:hover { background: #1a3445; }
-    .btn-submit:active { transform: scale(.99); }
-    .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
-
-    /* Toast */
-    #toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      padding: 12px 22px;
-      border-radius: 50px;
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s, transform .3s;
-      z-index: 999;
-    }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    #toast.success { background: var(--success); color: #fff; }
-    #toast.error   { background: var(--error);   color: #fff; }
-
-    /* Applications list */
-    .list-card { max-width: 680px; margin: 0 auto; }
-    .list-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    .list-header h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 20px;
-      color: var(--accent);
-    }
-    .btn-refresh {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 7px 14px;
-      font-size: 13px;
-      cursor: pointer;
-      color: var(--muted);
-      transition: border-color .2s, color .2s;
-    }
-    .btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
-
-    .app-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 18px;
-      margin-bottom: 10px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 4px 12px;
-      align-items: start;
-      transition: box-shadow .2s;
-    }
-    .app-item:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
-    .app-company { font-weight: 600; font-size: 15px; }
-    .app-title   { font-size: 13px; color: var(--muted); }
-    .app-date    { font-size: 12px; color: var(--muted); grid-column: 1; }
-    .app-notes   { font-size: 12px; color: var(--muted); margin-top: 4px; grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 8px; }
-
-    .badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 50px;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-    }
-    .badge-Beworben  { background: #e8f0fe; color: #1a56db; }
-    .badge-Interview { background: #fef3c7; color: #92400e; }
-    .badge-Warten    { background: #f3f4f6; color: #374151; }
-    .badge-Abgelehnt { background: #fee2e2; color: #991b1b; }
-    .badge-Angebot   { background: #d1fae5; color: #065f46; }
-
-    .empty-state {
-      text-align: center;
-      color: var(--muted);
-      padding: 32px;
-      font-size: 14px;
-    }
-  </style>
+  <title>Bewerbungstracker – Neue Bewerbung</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h1 class="page-title">Bewerbungs&shy;tracker</h1>
-<p class="page-subtitle">Alle Bewerbungen zentral erfassen und im Blick behalten.</p>
+<nav class="nav">
+  <a class="nav-brand" href="index.html">Bewerbungstracker</a>
+  <a class="nav-link active" href="index.html">+ Neue Bewerbung</a>
+  <a class="nav-link" href="overview.html">Übersicht</a>
+</nav>
 
-<div class="card">
-  <!-- Pflichtfelder -->
-  <div class="section-label">Pflichtfelder</div>
+<div class="page">
+  <div style="max-width:680px;margin:0 auto">
+    <h1 class="page-title">Neue Bewerbung</h1>
+    <p class="page-subtitle">Bewerbung erfassen und zentral speichern.</p>
 
-  <label for="company" class="req">Unternehmen</label>
-  <input type="text" id="company" placeholder="z. B. WERTGRUND" autocomplete="organization" />
+    <div class="card">
+      <!-- Pflichtfelder -->
+      <div class="section-label">Pflichtfelder</div>
 
-  <label for="date" class="req">Bewerbungsdatum</label>
-  <input type="date" id="date" />
+      <label for="company" class="req">Unternehmen</label>
+      <input type="text" id="company" placeholder="z. B. WERTGRUND" autocomplete="organization" />
 
-  <!-- Stelle -->
-  <div class="section-label">Stelle <span class="opt">optional</span></div>
+      <label for="date" class="req">Bewerbungsdatum</label>
+      <input type="date" id="date" />
 
-  <label for="jobtitle">Jobtitel</label>
-  <input type="text" id="jobtitle" placeholder="z. B. AI Automation Engineer" />
+      <!-- Stelle -->
+      <div class="section-label">Stelle <span class="opt">optional</span></div>
 
-  <label for="link">Link zur Stelle</label>
-  <input type="url" id="link" placeholder="https://..." />
+      <label for="jobtitle">Jobtitel</label>
+      <input type="text" id="jobtitle" placeholder="z. B. AI Automation Engineer" />
 
-  <div class="row">
-    <div>
-      <label for="status">Status</label>
-      <select id="status">
-        <option>Beworben</option>
-        <option>Interview</option>
-        <option>Warten</option>
-        <option>Abgelehnt</option>
-        <option>Angebot</option>
-      </select>
+      <label for="link">Link zur Stelle</label>
+      <input type="url" id="link" placeholder="https://..." />
+
+      <div class="row">
+        <div>
+          <label for="status">Status</label>
+          <select id="status">
+            <option>Beworben</option>
+            <option>Interview</option>
+            <option>Warten</option>
+            <option>Abgelehnt</option>
+            <option>Angebot</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Ansprechpartner -->
+      <div class="section-label">Ansprechpartner <span class="opt">optional</span></div>
+      <div class="collapsible-header" id="contactToggle" onclick="toggleContact()">
+        <span>Angaben zum Ansprechpartner hinzufügen</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="collapsible-body" id="contactBody">
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label for="contact_name">Name</label>
+            <input type="text" id="contact_name" placeholder="Vorname Nachname" />
+          </div>
+          <div>
+            <label for="contact_position">Position</label>
+            <input type="text" id="contact_position" placeholder="z. B. HR Manager" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="contact_email">E-Mail</label>
+            <input type="email" id="contact_email" placeholder="name@firma.de" />
+          </div>
+          <div>
+            <label for="contact_phone">Telefon</label>
+            <input type="tel" id="contact_phone" placeholder="+49 ..." />
+          </div>
+        </div>
+      </div>
+
+      <!-- Notizen -->
+      <div class="section-label">Notizen <span class="opt">optional</span></div>
+      <label for="notes">Anforderungen, Eindruck, Aufgaben …</label>
+      <textarea id="notes" placeholder="Was war wichtig?"></textarea>
+
+      <button class="btn-primary full" id="submitBtn" onclick="handleSubmit()">
+        Bewerbung speichern
+      </button>
     </div>
   </div>
-
-  <!-- Ansprechpartner (collapsible) -->
-  <div class="section-label">Ansprechpartner <span class="opt">optional</span></div>
-  <div class="collapsible-header" id="contactToggle" onclick="toggleContact()">
-    <span>Angaben zum Ansprechpartner hinzufügen</span>
-    <span class="chevron">▼</span>
-  </div>
-  <div class="collapsible-body" id="contactBody">
-    <div class="row" style="margin-top:12px">
-      <div>
-        <label for="contact_name">Name</label>
-        <input type="text" id="contact_name" placeholder="Vorname Nachname" />
-      </div>
-      <div>
-        <label for="contact_position">Position</label>
-        <input type="text" id="contact_position" placeholder="z. B. HR Manager" />
-      </div>
-    </div>
-    <div class="row">
-      <div>
-        <label for="contact_email">E-Mail</label>
-        <input type="email" id="contact_email" placeholder="name@firma.de" />
-      </div>
-      <div>
-        <label for="contact_phone">Telefon</label>
-        <input type="tel" id="contact_phone" placeholder="+49 ..." />
-      </div>
-    </div>
-  </div>
-
-  <!-- Notizen -->
-  <div class="section-label">Notizen <span class="opt">optional</span></div>
-  <label for="notes">Anforderungen, Eindruck, Aufgaben …</label>
-  <textarea id="notes" placeholder="Was war wichtig?"></textarea>
-
-  <button class="btn-submit" id="submitBtn" onclick="saveData()">Bewerbung speichern</button>
-</div>
-
-<!-- Application list -->
-<div class="list-card">
-  <div class="list-header">
-    <h2>Gespeicherte Bewerbungen</h2>
-    <button class="btn-refresh" onclick="loadApplications()">↻ Aktualisieren</button>
-  </div>
-  <div id="appList"><div class="empty-state">Lade …</div></div>
 </div>
 
 <div id="toast"></div>
 
-<script>
-function toggleContact() {
-  const toggle = document.getElementById('contactToggle');
-  const body   = document.getElementById('contactBody');
-  toggle.classList.toggle('open');
-  body.classList.toggle('open');
-}
-
-function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `show ${type}`;
-  setTimeout(() => t.className = '', 3200);
-}
-
-async function saveData() {
-  const company = document.getElementById('company').value.trim();
-  const date    = document.getElementById('date').value;
-
-  if (!company || !date) {
-    showToast('Bitte Unternehmen und Datum ausfüllen.', 'error');
-    return;
-  }
-
-  const data = {
-    company,
-    app_date:         date,
-    jobtitle:         document.getElementById('jobtitle').value.trim(),
-    link:             document.getElementById('link').value.trim(),
-    status:           document.getElementById('status').value,
-    contact_name:     document.getElementById('contact_name').value.trim(),
-    contact_email:    document.getElementById('contact_email').value.trim(),
-    contact_phone:    document.getElementById('contact_phone').value.trim(),
-    contact_position: document.getElementById('contact_position').value.trim(),
-    notes:            document.getElementById('notes').value.trim(),
-  };
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Wird gespeichert …';
-
-  try {
-    const res  = await fetch('api.php', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(data),
-    });
-    const json = await res.json();
-
-    if (json.success) {
-      showToast('✓ Bewerbung gespeichert!', 'success');
-      clearForm();
-      loadApplications();
-    } else {
-      showToast(json.error || 'Fehler beim Speichern.', 'error');
-    }
-  } catch (e) {
-    showToast('Netzwerkfehler – läuft der Server?', 'error');
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Bewerbung speichern';
-  }
-}
-
-function clearForm() {
-  ['company','jobtitle','link','contact_name','contact_email','contact_phone','contact_position','notes'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('date').value   = '';
-  document.getElementById('status').value = 'Beworben';
-}
-
-async function loadApplications() {
-  const list = document.getElementById('appList');
-  list.innerHTML = '<div class="empty-state">Lade …</div>';
-  try {
-    const res  = await fetch('api.php');
-    const json = await res.json();
-    if (!json.success || !json.data.length) {
-      list.innerHTML = '<div class="empty-state">Noch keine Bewerbungen gespeichert.</div>';
-      return;
-    }
-    list.innerHTML = json.data.map(a => `
-      <div class="app-item">
-        <div>
-          <div class="app-company">${esc(a.company)}</div>
-          <div class="app-title">${esc(a.jobtitle) || '<em style="opacity:.5">Kein Jobtitel</em>'}</div>
-        </div>
-        <span class="badge badge-${esc(a.status)}">${esc(a.status)}</span>
-        <div class="app-date">📅 ${a.app_date}${a.link ? ` &nbsp;·&nbsp; <a href="${esc(a.link)}" target="_blank" style="color:var(--accent)">Stellenanzeige ↗</a>` : ''}</div>
-        ${a.notes ? `<div class="app-notes">${esc(a.notes)}</div>` : ''}
-      </div>
-    `).join('');
-  } catch {
-    list.innerHTML = '<div class="empty-state">Fehler beim Laden der Bewerbungen.</div>';
-  }
-}
-
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// Set today's date as default
-document.getElementById('date').valueAsDate = new Date();
-
-// Initial load
-loadApplications();
-</script>
+<script src="app.js"></script>
+<script src="index.js"></script>
 </body>
 </html>
