@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bewerbungstracker – Übersicht</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="overview.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">Bewerbungstracker</a>
+  <a class="nav-link" href="index.html">+ Neue Bewerbung</a>
+  <a class="nav-link active" href="overview.html">Übersicht</a>
+</nav>
+
+<div class="page">
+
+  <!-- KPI-Kacheln -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card kpi-skeleton"></div>
+    <div class="kpi-card kpi-skeleton"></div>
+    <div class="kpi-card kpi-skeleton"></div>
+    <div class="kpi-card kpi-skeleton"></div>
+    <div class="kpi-card kpi-skeleton"></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-bar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="search" id="searchInput" placeholder="Unternehmen oder Jobtitel suchen …" oninput="applyFilters()" />
+    </div>
+    <div class="filter-group">
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">Alle Status</option>
+        <option>Beworben</option>
+        <option>Interview</option>
+        <option>Warten</option>
+        <option>Abgelehnt</option>
+        <option>Angebot</option>
+      </select>
+      <select id="sortBy" onchange="applyFilters()">
+        <option value="created_at">Neueste zuerst</option>
+        <option value="app_date">Bewerbungsdatum</option>
+        <option value="company">Unternehmen A–Z</option>
+      </select>
+    </div>
+    <button class="btn-ghost" onclick="loadAll()">↻</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap card">
+    <table class="app-table" id="appTable">
+      <thead>
+        <tr>
+          <th>Unternehmen</th>
+          <th>Jobtitel</th>
+          <th>Datum</th>
+          <th>Status</th>
+          <th>Ansprechpartner</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div>Lade Bewerbungen …</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Result count -->
+  <p class="result-count" id="resultCount"></p>
+
+</div>
+
+<!-- Detail drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-company" id="dCompany">—</div>
+      <div class="drawer-title"  id="dTitle">—</div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>
+
+<div id="toast"></div>
+
+<script src="app.js"></script>
+<script src="overview.js"></script>
+</body>
+</html>
