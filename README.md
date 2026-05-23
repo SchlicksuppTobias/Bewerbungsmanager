@@ -36,7 +36,7 @@ open http://localhost:8080
 
 ```json
 {
-  "company":          "WERTGRUND",
+  "company":          "Example",
   "app_date":         "2025-05-20",
   "jobtitle":         "AI Automation Engineer",
   "link":             "https://...",
