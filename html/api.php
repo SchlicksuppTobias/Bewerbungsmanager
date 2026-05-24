@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -71,6 +71,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $newId = $pdo->lastInsertId();
     echo json_encode(['success' => true, 'id' => $newId, 'message' => 'Bewerbung gespeichert.']);
+    exit;
+}
+
+// --- PATCH: update status of an application ---
+if ($_SERVER['REQUEST_METHOD'] === 'PATCH') {
+    $body    = json_decode(file_get_contents('php://input'), true);
+    $allowed = ['Beworben', 'Interview', 'Warten', 'Abgelehnt', 'Angebot'];
+
+    if (empty($body['id']) || empty($body['status']) || !in_array($body['status'], $allowed)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Ungültige ID oder Status.']);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("UPDATE applications SET status = :status WHERE id = :id");
+    $stmt->execute([':status' => $body['status'], ':id' => (int)$body['id']]);
+
+    if ($stmt->rowCount() === 0) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'error' => 'Bewerbung nicht gefunden.']);
+        exit;
+    }
+
+    echo json_encode(['success' => true, 'message' => 'Status aktualisiert.']);
     exit;
 }
 
